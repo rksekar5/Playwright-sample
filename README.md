@@ -44,4 +44,4 @@ Only the first change has been proposed. The later changes will have their own a
 
 Node/npm and baseline Playwright browser tooling were checked during onboarding. A Playwright smoke interaction using the system Chromium passed; this is not TaskBoard or regression-test coverage. Bundled browser downloads were blocked at `cdn.playwright.dev`; later UI testing must install the project's pinned browser with the required network destinations enabled.
 
-The MVP needs no authentication, database, external application APIs, or credentials. Git push works through platform-provided authentication. At proposal preparation time, GitHub API requests were blocked at `api.github.com`; draft pull request creation requires that destination in cloud environment settings. No credentials belong in these files.
+The MVP needs no authentication, database, external application APIs, or credentials. Git operations use platform-provided authentication. GitHub CLI pull request operations also need access to `api.github.com`; that destination was added to the environment draft, and draft PR creation succeeded. No credentials belong in these files.

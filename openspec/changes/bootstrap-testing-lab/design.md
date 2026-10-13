@@ -108,7 +108,7 @@ After implementation, a GitHub Actions workflow runs on PRs to `main` and pushes
 - Separate contract types can drift across two small packages → document one contract and introduce contract-oriented API tests in the next change; no third shared package yet.
 - A network failure can hide a successful mutation → preserve visible confirmed state and offer refresh before retrying uncertain actions.
 - Built-in system Chromium differs from Playwright-pinned browsers → future UI testing installs the lockfile-selected browser and resolves download-domain access; the earlier baseline browser check is not app coverage.
-- GitHub API access is currently denied → Git commits/pushes can proceed, but draft PR creation requires `api.github.com` in the environment network settings.
+- GitHub API network policy can prevent PR operations → allow `api.github.com` for the required GitHub CLI operations; Git authentication remains platform-provided. Draft PR creation succeeded during proposal preparation.
 
 ## Migration Plan
 
