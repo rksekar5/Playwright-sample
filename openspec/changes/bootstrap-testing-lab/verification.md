@@ -24,7 +24,7 @@ Validation in Codex Cloud used Node.js **24.19.0**, npm **11.9.0**, and OpenSpec
 | Compiled API startup | Passed in development, production, and test modes; health preserved data, disabled reset preserved tasks, restart restored empty data/ID 1 |
 | Browser acceptance | Keyboard create/edit/cancel/status/delete, trimming, local/API errors, failed mutations, delayed requests, refresh/retry, and confirmed-state guards passed |
 | Accessibility / responsive layout | Named regions/articles, role/label controls, field associations/alerts, and 390px layout checked; no browser runtime errors |
-| GitHub Actions foundation job | Pending first PR run; update this row only after a successful GitHub result |
+| GitHub Actions foundation job | [Run 38392571730](https://github.com/rksekar5/Playwright-sample/actions/runs/38392571730) passed installation, tests, typecheck, and build for implementation commit `aa9deba` |
 
 Lockfile SHA-256 before/after repeated installation: `e7e88f3ec608ac5717ba9379d0fd0373d41ede3084a7c55f13a7789674b08343`.
 
@@ -42,10 +42,10 @@ Every delta requirement is ADDED. No REMOVED/RENAMED behavior needs verification
 | Request shape/transport | Invalid object; JSON/media type; oversized body | `backend/src/app.ts`, `errors.ts` | HTTP error table checks JSON errors, status, unchanged store |
 | Consistent error responses | Field error; unknown route; unexpected failure | `backend/src/errors.ts` | Exact field response; unknown route; deliberately throwing store returns generic 500 |
 | Deterministic reset | Repeat reset; body rejection; disabled modes; no durable persistence | `backend/src/app.ts`, `tasks.ts` | Test/reset HTTP tests and compiled process restart checks |
-| Task listing/status groups | Populated board; empty board | `frontend/src/App.tsx` | One-off browser checks and live API integration; status-filter/order code review |
+| Task listing/status groups | Populated board; empty board | `frontend/src/App.tsx` | One-off browser checks, all three populated statuses, multiple-card creation order, and live API integration |
 | Loading/refresh failures | Initial failure; retry; data preserved on failed refresh | `frontend/src/App.tsx` | Delayed/failed GET interception, empty-state distinction, recovery and retained-card checks |
 | Create tasks | Success; repeated pending activation | `frontend/src/App.tsx` | Keyboard creation, empty input after success; delayed POST with duplicate form submissions yields one request |
-| Title validation/failed creation | Blank/oversized input; server/API failure | `frontend/src/App.tsx`, `api.ts` | Local validation/no POST; server field error, aborted transport, invalid response preserve draft/cards |
+| Title validation/failed creation | Blank/oversized input; server/API failure | `frontend/src/App.tsx`, `api.ts`, `TaskCard.tsx` | Blank/oversized create/edit validation sends no POST/PATCH; server field error, aborted transport, invalid response preserve draft/cards |
 | Edit titles | Rename; cancel; failed edit | `frontend/src/TaskCard.tsx` | Keyboard save/cancel and PATCH observation; intercepted field rejection retains heading/draft |
 | Change status | Reversible transitions; failed update | `frontend/src/TaskCard.tsx` | Keyboard transitions verified in API; rejected status keeps original selection/section |
 | Delete tasks | Success; failure | `frontend/src/TaskCard.tsx`, `api.ts` | Keyboard deletion/204 and empty section; failed deletion retains card; fetch-wrapper 204 unit test |
@@ -54,7 +54,7 @@ Every delta requirement is ADDED. No REMOVED/RENAMED behavior needs verification
 | Single-command startup | Start/function; shutdown/port conflict | Root dev script, backend entry point, Vite config | Default/override functional checks; independent occupied-port and SIGINT checks |
 | Central config | Overrides; invalid setting | `config/runtime.ts` | Four config tests; actual overridden listeners/proxy; invalid-port startup failure |
 | Health/functional readiness | Health contract; useful readiness | `backend/src/app.ts`, documented checks | Health exact JSON and unchanged data; real UI/API CRUD plus frontend response |
-| Foundational CI | Implemented foundation checked in CI | `.github/workflows/foundation.yml` | Local identical commands passed; GitHub result pending |
+| Foundational CI | Implemented foundation checked in CI | `.github/workflows/foundation.yml` | Local identical commands and all GitHub Foundation job steps passed |
 | Isolated test-mode guidance | Reset baseline; understand isolation | README, `docs/api.md`, `docs/testing.md` | Executed bodyless repeated resets/ID restart; documented per-instance reset and separate roadmap |
 
 Source paths in the table are relative to `packages/` unless they start with `config/`, a dot, or name a root document. The 53 scenarios describe acceptance behavior; they are not 53 committed test cases. No claim of comprehensive browser regression coverage is made.
@@ -63,8 +63,12 @@ Source paths in the table are relative to `packages/` unless they start with `co
 
 | Dimension | Current status |
 | --- | --- |
-| Completeness | App/docs/tests implemented; task 4.1 awaits real GitHub CI, task 5.2 awaits final documentation/checklist confirmation |
-| Correctness | All 22 requirements mapped; automated foundation and one-off functional acceptance passed; CI outcome not yet verified |
+| Completeness | 15/15 tracked tasks complete; all 22 ADDED requirements implemented and mapped |
+| Correctness | All 22 requirements and 53 scenarios reviewed against implementation/evidence; automated foundation, functional acceptance, and GitHub CI passed |
 | Coherence | Two workspaces, shared settings, plain validation, same-origin proxy, confirmed UI state, test-mode reset, no deferred integration added |
 
-Final verify assessment and GitHub run evidence will be recorded after PR checks complete. No merge or archive is authorized by this report.
+The `openspec-verify-change` review reloaded the proposal, all three specs, design, and CLI-tracked tasks; inspected the implementation; and checked the mapping above. No applicable verification dimensions were skipped. No critical issues or warnings were found; all verification checks passed for the scoped foundation. No merge or archive is performed or authorized by this report.
+
+Cloud command-session closure was observed to leave npm descendants running. The app supervisor/process-group SIGINT shutdown was verified, and the recorded-group start/stop procedure in `docs/testing.md` was executed. All default/override listener ports were confirmed closed at the end. Future cloud tasks must use that procedure rather than assuming session closure stops children.
+
+The environment install script was also executed as written: pinned external OpenSpec installation, frozen app installation, 18 passing tests, strict type checking, both builds, and strict all-item OpenSpec validation. Startup readiness verified health, frontend delivery, same-origin create/list/update/delete, cleanup of its own task, and disabled reset in normal mode. Saved environment configuration is a draft, not a claim of publication or fresh-task restoration.

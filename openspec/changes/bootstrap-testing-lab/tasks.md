@@ -25,7 +25,7 @@ This checklist tracks the approved implementation. Checked tasks have been imple
 
 ## 4. Foundational CI
 
-- [ ] 4.1 Add a GitHub Actions workflow for pull requests to `main` and pushes to `main`, with read-only permissions, officially sourced action SHA pins, Node 24, npm cache, `npm ci`, typecheck, and build; verify its job succeeds in GitHub and document exactly which checks it runs. Do not add Playwright or MCP jobs yet.
+- [x] 4.1 Add a GitHub Actions workflow for pull requests to `main` and pushes to `main`, with read-only permissions, officially sourced action SHA pins, Node 24, npm cache, `npm ci`, typecheck, and build; verify its job succeeds in GitHub and document exactly which checks it runs. Do not add Playwright or MCP jobs yet.
 
 ## 5. Integrated acceptance
 

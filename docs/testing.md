@@ -16,6 +16,22 @@ In another terminal, run the [documented HTTP round trip](api.md#executable-http
 
 Repeat with `API_PORT=3101 UI_PORT=5273 NODE_ENV=test npm run dev`, adjusting HTTP commands to 3101 and browser tools to 5273. Interrupt the root dev command and verify both listeners close. Starting with an occupied API/UI port or `API_PORT=abc` must fail clearly with a nonzero exit status. Builds do not start services. `npm run start --workspace @taskboard/backend` verifies the compiled API after `npm run build`.
 
+### Cloud command-session lifecycle
+
+Closing a cloud command session can terminate its shell wrapper while leaving npm children running. Keep the app in a managed process group and record the group you started instead of assuming closing a session stops it. From the checkout in this cloud environment:
+
+```sh
+TASKBOARD_RUN_DIR=$(mktemp -d /workspace/.taskboard-run.XXXXXX)
+setsid npm run dev > "$TASKBOARD_RUN_DIR/dev.log" 2>&1 < /dev/null &
+TASKBOARD_PROCESS_GROUP=$!
+printf '%s\n' "$TASKBOARD_PROCESS_GROUP" > "$TASKBOARD_RUN_DIR/process-group"
+printf 'Process group: %s\nRun directory: %s\n' "$TASKBOARD_PROCESS_GROUP" "$TASKBOARD_RUN_DIR"
+# After functional checks, stop only this recorded group:
+kill -INT -- "-$TASKBOARD_PROCESS_GROUP"
+```
+
+Across separate shell calls, read `process-group` from the exact run directory printed by your start command. Inspect its log if readiness fails. Verify both listeners close after shutdown; do not stop unrelated processes to free ports. This start/readiness/stop flow was executed successfully in Codex Cloud.
+
 ## Browser acceptance smoke
 
 Use a dedicated test-mode instance and reset it before starting. The board exposes named `To Do`, `In Progress`, and `Done` regions and stable `Task <id>` articles. Identical action names are scoped to each article; CSS classes and card positions are not locator contracts.
