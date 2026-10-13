@@ -113,3 +113,7 @@ After implementation, a GitHub Actions workflow runs on PRs to `main` and pushes
 ## Migration Plan
 
 This is a greenfield proposal with no data migration. First review this planning-only PR. Only after approval and a separate apply request, execute the unchecked tasks, demonstrate acceptance, and archive the implemented change to promote delta specifications into `openspec/specs/`. Rollback consists of reverting the implementation commits and stopping its processes; there is no durable data to preserve.
+
+## Approved implementation clarification
+
+The subsequent implementation request explicitly adds foundational automated tests. Use Node's built-in runner with `tsx` for runtime settings, store/validation checks, a small live-HTTP API smoke layer, and frontend fetch handling. Run these tests in the foundation CI job alongside installation, type checks, and builds. This does not add Playwright Test suites or MCP integration; those remain separate changes. Proposal-time observations above remain historical context; current results are recorded in `verification.md`.

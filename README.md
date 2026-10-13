@@ -1,47 +1,90 @@
 # Playwright MCP Testing Lab
 
-An educational TaskBoard system under test for TypeScript, React + Vite, Express, Playwright Test, Microsoft's official `@playwright/mcp`, Codex, OpenSpec, and GitHub Actions.
+A small TaskBoard system under test for learning Quality Engineering with TypeScript, React + Vite, Express, Playwright, Codex, and OpenSpec.
 
-**Current state: proposal only.** There is no application code or runnable project test suite yet. OpenSpec is initialized for Codex, and `bootstrap-testing-lab` is ready for review. Approval and a separate apply request are required before implementation.
+The `bootstrap-testing-lab` foundation implements task CRUD, an accessible board, deterministic in-memory storage, and a test-only reset. The full Playwright API suite, UI suite, and Microsoft `@playwright/mcp` integration remain separate future changes. There is no authentication, database, external API, or AI feature in the app.
 
-## Review the first change
+## Quick start
 
-- [Proposal](openspec/changes/bootstrap-testing-lab/proposal.md): scope, capabilities, and deferred work.
-- [API specification](openspec/changes/bootstrap-testing-lab/specs/task-api/spec.md): request/response contracts and validation scenarios.
-- [UI specification](openspec/changes/bootstrap-testing-lab/specs/taskboard-ui/spec.md): accessible task management and error behavior.
-- [Development specification](openspec/changes/bootstrap-testing-lab/specs/development-workflow/spec.md): reproducible commands, cloud startup, and foundational CI.
-- [Design](openspec/changes/bootstrap-testing-lab/design.md): architecture and decisions.
-- [Tasks](openspec/changes/bootstrap-testing-lab/tasks.md): unchecked implementation and acceptance plan.
-
-## OpenSpec workflow
-
-Use Node.js 24 LTS (the cloud machine currently has 24.19.0). OpenSpec was initialized with release **1.14.1**, the latest npm release at setup time, using `openspec init --tools codex --profile core --no-animation`. Generated Codex skills are committed under `.agents/skills/`.
-
-From the repository root, run the pinned CLI without adding application dependency files:
+Use **Node.js 24 LTS** (`nvm use` if you use nvm). From the repository root:
 
 ```sh
-npx --yes --package=@fission-ai/openspec@1.14.1 openspec --version
+npm ci
+npm run dev
+```
+
+The frontend listens on port **5173** and the API on **3001**, binding to `0.0.0.0` for cloud compatibility. Vite forwards same-origin `/api` requests to the API. Use a local browser or your cloud agent's browser tools to exercise the frontend. Interrupt the root command to stop both services; occupied ports fail startup instead of selecting different ports.
+
+The board starts empty. Create a task with **Task title** and **Add task**; use **Edit title**, **Status**, and **Delete task** on its card. Data disappears on API restart. Errors preserve drafts and the last confirmed board state; **Refresh tasks** reconciles server state after network failures. Vite reloads frontend edits; restart the dev command after backend or runtime-setting changes.
+
+## Configuration
+
+The single settings definition lives in [`config/runtime.ts`](config/runtime.ts). Both workspace startup commands load the optional root `.env`; injected process variables take precedence. Copy `.env.example` if you want a local file. Do not commit `.env`.
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `APP_HOST` | `0.0.0.0` | Binding IP address or `localhost` |
+| `API_PORT` | `3001` | Backend port and frontend proxy target |
+| `UI_PORT` | `5173` | Frontend port |
+| `NODE_ENV` | `development` | Exact `test` enables the reset endpoint |
+
+Ports must be distinct integers from 1 to 65535. For example:
+
+```sh
+API_PORT=3101 UI_PORT=5273 NODE_ENV=test npm run dev
+```
+
+Root npm commands delegate to workspace commands; their working directories are the relevant package roots. Run the compiled API with `npm run start --workspace @taskboard/backend` after building. Production full-stack hosting is outside this foundation.
+
+## Checks
+
+```sh
+npm test
+npm run typecheck
+npm run build
+# Or run all three:
+npm run check
+```
+
+Foundational tests use Node's built-in test runner with `tsx`: runtime settings, store/validation behavior, small live-HTTP API smoke checks, and the frontend fetch wrapper. Each API test starts its own app on an ephemeral port. These are not the future Playwright APIRequestContext or browser regression suites. Both packages use strict TypeScript, and root commands propagate failures. Builds emit `packages/backend/dist/` and `packages/frontend/dist/`.
+
+The [Foundation GitHub Actions workflow](.github/workflows/foundation.yml) runs `npm ci`, tests, type checks, and builds on pull requests to `main` and pushes to `main`, with Node 24 and read-only repository permissions. Action references are pinned to official release commit SHAs. No browser or MCP job is included yet.
+
+## API and test isolation
+
+See [API contracts and executable curl examples](docs/api.md), [manual UI/cloud checks](docs/testing.md), and [OpenSpec verification evidence](openspec/changes/bootstrap-testing-lab/verification.md).
+
+Start a dedicated test-mode instance and reset it without a request body:
+
+```sh
+NODE_ENV=test npm run dev
+curl --fail-with-body -i -X POST http://127.0.0.1:3001/api/test/reset
+curl --fail-with-body http://127.0.0.1:3001/health
+curl --fail-with-body http://127.0.0.1:3001/api/tasks
+```
+
+Expected results are 204 with no body, `{ "status": "ok" }`, and `{ "tasks": [] }`. The next task gets ID `1`. Outside test mode reset returns 404 and leaves tasks unchanged. Reset affects the **whole process-local store**: use serial tests against a shared instance or separate instances/ports for parallel workers. Keep MCP exploratory sessions separate from deterministic regression fixtures. Do not deploy or expose test mode as a public service.
+
+## OpenSpec
+
+The approved [proposal](openspec/changes/bootstrap-testing-lab/proposal.md), [design](openspec/changes/bootstrap-testing-lab/design.md), [task checklist](openspec/changes/bootstrap-testing-lab/tasks.md), and capability specifications remain in the active change. Implementation is not automatically archived or merged.
+
+OpenSpec **1.14.1** initialized Codex support. Use the committed `$openspec-apply-change` and `$openspec-verify-change` skills (equivalents of apply/verify in this release). The verify skill was added with the supported custom workflow profile. Run the pinned CLI from the root:
+
+```sh
 npx --yes --package=@fission-ai/openspec@1.14.1 openspec status --change bootstrap-testing-lab
 npx --yes --package=@fission-ai/openspec@1.14.1 openspec validate bootstrap-testing-lab --strict
 ```
 
-In Codex Cloud, the installed CLI is also available at `/workspace/.tools/openspec/node_modules/.bin/openspec`; add that directory to `PATH` for a task session. Reuse the existing checkout: cloud tasks are already isolated and need no additional Git worktree.
+Codex Cloud already isolates each task; use its existing checkout and do not create a worktree unless explicitly requested. The environment also installs the pinned CLI outside the checkout at `/workspace/.tools/openspec/node_modules/.bin/openspec`.
 
-The first proposal was produced with the installed [`openspec-propose`](.agents/skills/openspec-propose/SKILL.md) workflow. It creates planning artifacts and stops for review. After approval and an explicit implementation request, use `$openspec-apply-change bootstrap-testing-lab`; do not archive until implementation and acceptance checks are complete.
+## Separate roadmap changes
 
-## Roadmap
-
-| Separate change | Intended scope |
+| Change | Scope |
 | --- | --- |
-| `bootstrap-testing-lab` | Full-stack app, deterministic in-memory data/reset, accessible UI, startup/build documentation, foundation build/typecheck CI |
-| `add-playwright-api-tests` | APIRequestContext positive, negative, and contract-oriented regression tests |
-| `add-playwright-ui-tests` | UI functional tests, isolated fixtures, accessible locators, UI/API integration, browser CI |
-| `integrate-playwright-mcp` | Official Microsoft `@playwright/mcp` configuration and Codex exploratory examples, separate from regression tests |
+| `bootstrap-testing-lab` | App, deterministic reset, accessible UI, foundational Node tests, build/typecheck CI |
+| `add-playwright-api-tests` | Positive, negative, and contract-oriented APIRequestContext regression tests |
+| `add-playwright-ui-tests` | UI regression tests, fixtures, accessible locators, UI/API integration, browser CI |
+| `integrate-playwright-mcp` | Official Microsoft `@playwright/mcp` configuration and Codex exploration examples |
 
-Only the first change has been proposed. The later changes will have their own artifacts and reviews.
-
-## Environment notes
-
-Node/npm and baseline Playwright browser tooling were checked during onboarding. A Playwright smoke interaction using the system Chromium passed; this is not TaskBoard or regression-test coverage. Bundled browser downloads were blocked at `cdn.playwright.dev`; later UI testing must install the project's pinned browser with the required network destinations enabled.
-
-The MVP needs no authentication, database, external application APIs, or credentials. Git operations use platform-provided authentication. GitHub CLI pull request operations also need access to `api.github.com`; that destination was added to the environment draft, and draft PR creation succeeded. No credentials belong in these files.
+Later UI testing must install its lockfile-selected Playwright browser and enable the official download destinations in cloud settings. System Chromium can be used for one-off implementation smoke checks; it is not the future pinned regression-browser setup.
