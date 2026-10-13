@@ -1,0 +1,49 @@
+schema: spec-driven
+
+context: |
+  Playwright MCP Testing Lab is an educational, open-source TaskBoard system under test.
+  Use TypeScript, React + Vite, Node.js + Express, npm workspaces, and a maintained Node LTS.
+  Favor small, readable examples and deterministic in-memory data over production complexity.
+  The MVP has no authentication, authorization, database, external APIs, or AI features.
+  Keep app foundation, Playwright API tests, Playwright UI tests, and official Microsoft
+  @playwright/mcp exploratory workflows in separate changes. MCP exploration must remain
+  separate from deterministic regression tests. Use accessible, stable UI controls.
+
+rules:
+  proposal:
+    - Explicitly list the scope boundary and deferred roadmap changes.
+  specs:
+    - Define observable acceptance scenarios, including validation and error behavior.
+  tasks:
+    - Keep tasks actionable and unchecked until implementation and verification occur.
+
+# Project context (optional)
+# Add only constraints that should guide OpenSpec artifacts and workflows.
+# Include constraints an agent cannot infer by reading the code.
+# Keep general project documentation and discoverable codebase facts out.
+# Example:
+#   context: |
+#     Designs and tasks must cover Windows, macOS, and Linux
+#     Write all artifacts in Spanish
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
